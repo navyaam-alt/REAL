@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Your Property - SimpleProp</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>List Your Property (Cloud Powered)</h2>
+        <a href="index.html">← Back to Home</a>
+        
+        <form id="sellerForm">
+            <label>Listing Purpose:</label>
+            <select id="purpose">
+                <option value="Sale">For Sale</option>
+                <option value="Rent">For Rent</option>
+                <option value="Lease">For Lease</option>
+            </select>
+
+            <label>Property Category:</label>
+            <select id="type">
+                <option value="Apartment">Apartment / Flat</option>
+                <option value="Independent House">Independent House / Villa</option>
+                <option value="PG">PG / Co-living</option>
+                <option value="Plot">Plot / Land</option>
+            </select>
+
+            <div id="bhkContainer">
+                <label>BHK / Room Configuration:</label>
+                <select id="bhk">
+                    <option value="1 BHK">1 BHK</option>
+                    <option value="2 BHK">2 BHK</option>
+                    <option value="3 BHK">3 BHK</option>
+                    <option value="4+ BHK">4+ BHK</option>
+                    <option value="1 Room / Studio">1 Room / Studio</option>
+                </select>
+            </div>
+
+            <label>Building / Property Name:</label>
+            <input type="text" id="buildingName" placeholder="e.g., Green Valley Apartments" required>
+
+            <label>City:</label>
+            <input type="text" id="city" placeholder="e.g., Bengaluru" required>
+
+            <label>Locality / Area:</label>
+            <input type="text" id="locality" placeholder="e.g., Koramangala, Indiranagar" required>
+
+            <label>Price / Monthly Rent (₹):</label>
+            <input type="number" id="price" placeholder="Enter Amount in INR" required>
+
+            <label class="checkbox-label">
+                <input type="checkbox" id="isNegotiable">
+                <span>Price is Negotiable</span>
+            </label>
+
+            <label>Upload Property Photos:</label>
+            <input type="file" id="photos" accept="image/*" multiple required>
+
+            <label>Phone Number for Direct Calls:</label>
+            <input type="tel" id="phone" placeholder="9876543210" pattern="[0-9]{10}" required>
+
+            <label class="checkbox-label">
+                <input type="checkbox" id="sameAsPhone" checked onchange="toggleWhatsAppInput()">
+                <span>WhatsApp number is same as calling number</span>
+            </label>
+
+            <div id="whatsappGroup" style="display: none;">
+                <label>WhatsApp Number:</label>
+                <input type="tel" id="whatsapp" placeholder="9876543210" pattern="[0-9]{10}">
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-primary">Publish Listing</button>
+        </form>
+    </div>
+
+    <script>
+        // LIVE SUPABASE CREDENTIALS
+        const SUPABASE_URL = 'https://nwdiemjafncmcrvcbwrt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53ZGllbWphZm5jbWNydmNid3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3ODkyMzEsImV4cCI6MjEwNDM2NTIzMX0.KmCRaePtVry5v4Jq32bK5BVw0qBLoiE8a_IQD0HzYBI';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Hide BHK selection if category is Plot
+        document.getElementById('type').addEventListener('change', function() {
+            document.getElementById('bhkContainer').style.display = this.value === 'Plot' ? 'none' : 'block';
+        });
+
+        function toggleWhatsAppInput() {
+            document.getElementById('whatsappGroup').style.display = document.getElementById('sameAsPhone').checked ? 'none' : 'block';
+        }
+
+        // Upload photos to property-photos Storage Bucket
+        async function uploadPhotosToSupabase(files) {
+            const photoUrls = [];
+            for (let file of files) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+                const { data, error } = await supabase.storage.from('property-photos').upload(fileName, file);
+                if (error) throw error;
+
+                const { data: publicUrlData } = supabase.storage.from('property-photos').getPublicUrl(fileName);
+                photoUrls.push(publicUrlData.publicUrl);
+            }
+            return photoUrls;
+        }
+
+        document.getElementById('sellerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = 'Uploading & Saving...';
+            submitBtn.disabled = true;
+
+            try {
+                const fileInput = document.getElementById('photos');
+                const photoUrls = await uploadPhotosToSupabase(fileInput.files);
+
+                const propertyType = document.getElementById('type').value;
+                const phoneNum = document.getElementById('phone').value.trim();
+                const sameAsPhone = document.getElementById('sameAsPhone').checked;
+                const whatsappNum = sameAsPhone ? phoneNum : (document.getElementById('whatsapp').value.trim() || phoneNum);
+
+                // Save listing directly into Supabase properties table
+                const { data, error } = await supabase.from('properties').insert([
+                    {
+                        purpose: document.getElementById('purpose').value,
+                        type: propertyType,
+                        bhk: propertyType === 'Plot' ? 'N/A' : document.getElementById('bhk').value,
+                        name: document.getElementById('buildingName').value,
+                        city: document.getElementById('city').value.toLowerCase().trim(),
+                        locality: document.getElementById('locality').value.toLowerCase().trim(),
+                        price: Number(document.getElementById('price').value),
+                        isNegotiable: document.getElementById('isNegotiable').checked,
+                        photos: photoUrls,
+                        phone: phoneNum,
+                        whatsapp: whatsappNum
+                    }
+                ]);
+
+                if (error) throw error;
+
+                alert('Property published live to the database!');
+                window.location.href = 'buyer.html';
+            } catch (err) {
+                alert('Error publishing listing: ' + err.message);
+                submitBtn.innerText = 'Publish Listing';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

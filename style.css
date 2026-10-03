@@ -1,0 +1,356 @@
+/* Base Styling & Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+/* Home Page Layout */
+.home-body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-logo {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.nav-logo span {
+    color: #38bdf8;
+}
+
+.nav-tag {
+    font-size: 13px;
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    font-weight: 600;
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    padding: 60px 5% 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.hero-section h1 {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 18px;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    color: #94a3b8;
+    max-width: 650px;
+    margin: 0 auto 45px;
+}
+
+/* Action Cards Grid */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.card-action {
+    text-decoration: none;
+    color: inherit;
+    padding: 35px 30px;
+    border-radius: 20px;
+    text-align: left;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.card-buyer {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-buyer:hover {
+    transform: translateY(-8px);
+    border-color: #38bdf8;
+    box-shadow: 0 15px 35px rgba(56, 189, 248, 0.25);
+}
+
+.card-seller {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-seller:hover {
+    transform: translateY(-8px);
+    border-color: #a855f7;
+    box-shadow: 0 15px 35px rgba(168, 85, 247, 0.25);
+}
+
+.card-icon {
+    font-size: 42px;
+    margin-bottom: 20px;
+}
+
+.card-content h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.card-content p {
+    color: #94a3b8;
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+.card-btn {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 15px;
+    color: #38bdf8;
+}
+
+.card-seller .card-btn {
+    color: #c084fc;
+}
+
+/* Features Section */
+.features-section {
+    max-width: 1100px;
+    margin: 60px auto 40px;
+    padding: 0 5%;
+    text-align: center;
+}
+
+.features-section h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 35px;
+    color: #f8fafc;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 25px 20px;
+    border-radius: 16px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
+
+.f-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.feature-card h4 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #f1f5f9;
+}
+
+.feature-card p {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.home-footer {
+    text-align: center;
+    padding: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Standard Container for Forms & Listings */
+.container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.container h2 {
+    margin-bottom: 5px;
+}
+
+.container a {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: auto;
+}
+
+.btn-primary {
+    width: 100%;
+    margin-top: 25px;
+    background: #2563eb;
+    color: #fff;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+/* Property Cards inside Buyer.html */
+.property-card {
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.badge-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.badge-purpose { background: #dbeafe; color: #1e40af; }
+.badge-bhk { background: #f3e8ff; color: #6b21a8; }
+.badge-negotiable { background: #dcfce7; color: #166534; }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-whatsapp {
+    flex: 1;
+    background: #25d366;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.btn-call {
+    flex: 1;
+    background: #0f172a;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .hero-section h1 {
+        font-size: 32px;
+    }
+}

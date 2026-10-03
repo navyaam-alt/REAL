@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Properties - SimpleProp</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Find Properties</h2>
+        <a href="index.html">← Back to Home</a>
+
+        <!-- Live Filters -->
+        <label>Purpose:</label>
+        <select id="searchPurpose" onchange="searchProperties()">
+            <option value="All">Show All (Buy, Rent, Lease)</option>
+            <option value="Sale">Buy</option>
+            <option value="Rent">Rent</option>
+            <option value="Lease">Lease</option>
+        </select>
+
+        <label>BHK Configuration:</label>
+        <select id="searchBhk" onchange="searchProperties()">
+            <option value="All">Any BHK / Size</option>
+            <option value="1 BHK">1 BHK</option>
+            <option value="2 BHK">2 BHK</option>
+            <option value="3 BHK">3 BHK</option>
+            <option value="4+ BHK">4+ BHK</option>
+            <option value="1 Room / Studio">1 Room / Studio</option>
+        </select>
+
+        <label>City:</label>
+        <input type="text" id="searchCity" placeholder="e.g., Bengaluru" oninput="searchProperties()">
+
+        <label>Locality / Area:</label>
+        <input type="text" id="searchLocality" placeholder="e.g., Koramangala" oninput="searchProperties()">
+
+        <h3 style="margin-top: 30px;">Available Listings:</h3>
+        <div id="resultsList">Loading listings from cloud database...</div>
+    </div>
+
+    <script>
+        // LIVE SUPABASE CREDENTIALS
+        const SUPABASE_URL = 'https://nwdiemjafncmcrvcbwrt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53ZGllbWphZm5jbWNydmNid3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3ODkyMzEsImV4cCI6MjEwNDM2NTIzMX0.KmCRaePtVry5v4Jq32bK5BVw0qBLoiE8a_IQD0HzYBI';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function searchProperties() {
+            const container = document.getElementById('resultsList');
+            
+            const cityQuery = document.getElementById('searchCity').value.toLowerCase().trim();
+            const localityQuery = document.getElementById('searchLocality').value.toLowerCase().trim();
+            const purposeQuery = document.getElementById('searchPurpose').value;
+            const bhkQuery = document.getElementById('searchBhk').value;
+
+            // Fetch live properties from Supabase
+            let query = supabase.from('properties').select('*').order('id', { ascending: false });
+
+            if (purposeQuery !== 'All') query = query.eq('purpose', purposeQuery);
+            if (bhkQuery !== 'All') query = query.eq('bhk', bhkQuery);
+            if (cityQuery !== '') query = query.ilike('city', `%${cityQuery}%`);
+            if (localityQuery !== '') query = query.ilike('locality', `%${localityQuery}%`);
+
+            const { data: properties, error } = await query;
+
+            if (error) {
+                container.innerHTML = `<p style="color: red;">Error loading properties: ${error.message}</p>`;
+                return;
+            }
+
+            displayProperties(properties);
+        }
+
+        function displayProperties(list) {
+            const container = document.getElementById('resultsList');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = '<p style="margin-top: 15px; color: #718096;">No matching properties found.</p>';
+                return;
+            }
+
+            list.forEach(prop => {
+                const priceLabel = prop.purpose === 'Rent' ? '₹' + prop.price.toLocaleString() + ' / month' : '₹' + prop.price.toLocaleString();
+                const bhkHeading = prop.type === 'Plot' ? '' : `${prop.bhk} `;
+                const cardTitle = `${bhkHeading}${prop.type} for ${prop.purpose}`;
+
+                let imagesHTML = '';
+                if (prop.photos && prop.photos.length > 0) {
+                    imagesHTML = '<div style="display: flex; gap: 10px; overflow-x: auto; margin-top: 12px;">';
+                    prop.photos.forEach(src => {
+                        imagesHTML += `<img src="${src}" style="width: 130px; height: 95px; object-fit: cover; border-radius: 6px;" alt="Property Image">`;
+                    });
+                    imagesHTML += '</div>';
+                }
+
+                const targetWhatsapp = prop.whatsapp || prop.phone;
+                const waText = encodeURIComponent(`Hi, I saw your listing "${cardTitle}" at ${prop.name} (${prop.locality.toUpperCase()}) on SimpleProp and I am interested!`);
+                const whatsappUrl = `https://wa.me/91${targetWhatsapp}?text=${waText}`;
+
+                container.innerHTML += `
+                    <div class="property-card">
+                        <div class="badge-container">
+                            <span class="badge badge-purpose">FOR ${prop.purpose.toUpperCase()}</span>
+                            ${prop.type !== 'Plot' ? `<span class="badge badge-bhk">${prop.bhk}</span>` : ''}
+                            ${prop.isNegotiable ? '<span class="badge badge-negotiable">NEGOTIABLE</span>' : ''}
+                        </div>
+
+                        <h3 style="margin-top: 5px;">${cardTitle}</h3>
+                        <p style="color: #4a5568; font-size: 14px; margin-bottom: 8px;">Building/Plot: <strong>${prop.name}</strong></p>
+
+                        ${imagesHTML}
+
+                        <p style="margin-top: 12px;"><strong>Location:</strong> ${prop.locality.toUpperCase()}, ${prop.city.toUpperCase()}</p>
+                        <p style="margin-top: 4px;"><strong>Price:</strong> ${priceLabel}</p>
+
+                        <div class="action-buttons">
+                            <a href="${whatsappUrl}" target="_blank" class="btn-whatsapp">💬 Chat on WhatsApp</a>
+                            <a href="tel:${prop.phone}" class="btn-call">📞 Call Owner</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.onload = function() {
+            searchProperties();
+        };
+    </script>
+</body>
+</html>
